@@ -1,0 +1,366 @@
+name: 'Main'
+on:
+    push:
+    pull_request:
+    create:
+        tags:
+            - v*
+    workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref || '' }}-${{ github.base_ref || '' }}-${{ github.ref != 'refs/heads/main' || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+    wasm_mvp:
+        name: Wasm / mvp
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  DUCKDB_PLATFORM="wasm_mvp" ./scripts/wasm_build_lib.sh relperf mvp
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-mvp
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-mvp.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-mvp.wasm
+                  retention-days: 1
+
+    wasm_eh:
+        name: Wasm / eh
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  DUCKDB_PLATFORM="wasm_eh" ./scripts/wasm_build_lib.sh relperf eh
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-eh
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-eh.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-eh.wasm
+                  retention-days: 1
+
+    wasm_coi:
+        name: Wasm / coi
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  DUCKDB_PLATFORM="wasm_coi" ./scripts/wasm_build_lib.sh relperf coi
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-coi
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.pthread.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.wasm
+                  retention-days: 1
+
+    wasm_mvp_loadable:
+        name: Wasm / mvp (loadable version)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  cp .github/config/extension_config_wasm.cmake submodules/duckdb/extension/extension_config.cmake
+                  DUCKDB_PLATFORM="wasm_mvp" DUCKDB_WASM_LOADABLE_EXTENSIONS=1 GEN=ninja ./scripts/wasm_build_lib.sh relsize mvp
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-mvp-loadable
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-mvp.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-mvp.wasm
+                  retention-days: 1
+
+    wasm_eh_loadable:
+        name: Wasm / eh (loadable version)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  cp .github/config/extension_config_wasm.cmake submodules/duckdb/extension/extension_config.cmake
+                  DUCKDB_PLATFORM="wasm_eh" DUCKDB_WASM_LOADABLE_EXTENSIONS=1 GEN=ninja ./scripts/wasm_build_lib.sh relsize eh
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-eh-loadable
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-eh.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-eh.wasm
+                  retention-days: 1
+
+    wasm_coi_loadable:
+        name: Wasm / coi (loadable version)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - name: Prepare repository
+              run: |
+                  [ -f duckdb.patch ] && cd submodules/duckdb && git apply ../../duckdb.patch || echo "No patching needed"
+
+            - uses: mymindstorm/setup-emsdk@v14
+              with:
+                  version: 'latest'
+
+            - name: Setup Ccache
+              uses: hendrikmuhs/ccache-action@main
+              with:
+                  key: ${{ github.job }}
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Build Wasm module
+              run: |
+                  cp .github/config/extension_config_wasm.cmake submodules/duckdb/extension/extension_config.cmake
+                  DUCKDB_PLATFORM="wasm_threads" DUCKDB_WASM_LOADABLE_EXTENSIONS="signed" GEN=ninja ./scripts/wasm_build_lib.sh relsize coi
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wasm-coi-loadable
+                  path: |
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.pthread.js
+                      ./packages/duckdb-wasm/src/bindings/duckdb-coi.wasm
+                  retention-days: 1
+
+    js_libs_loadable:
+        name: Js / Libraries (loadable version)
+        runs-on: ubuntu-latest
+        needs:
+            - wasm_mvp_loadable
+            - wasm_eh_loadable
+            - wasm_coi_loadable
+            - clang_format
+            - eslint
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  submodules: 'recursive'
+                  fetch-depth: 0
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '18.x'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Git submodule status
+              run: |
+                  git submodule status > git_submodule_status.txt
+
+            - name: Cache rust build
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ./.cargo/bin/
+                      ./.cargo/registry/index/
+                      ./.cargo/registry/cache/
+                      ./.cargo/git/db/
+                      ./target
+                  key: ${{ runner.os }}-shell-${{ hashFiles('./Cargo.lock') }}-${{ hashFiles('./packages/duckdb-wasm-shell/crate/src/**') }}
+                  restore-keys: |
+                      ${{ runner.os }}-shell-
+
+            - name: Cache node_modules
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ./node_modules
+                      ./packages/benchmarks/node_modules
+                      ./packages/duckdb-wasm/node_modules
+                      ./packages/duckdb-wasm-shell/node_modules
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: wasm-mvp-loadable
+                  path: ./packages/duckdb-wasm/src/bindings/
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: wasm-eh-loadable
+                  path: ./packages/duckdb-wasm/src/bindings/
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: wasm-coi-loadable
+                  path: ./packages/duckdb-wasm/src/bindings/
+
+            - name: Prepare repository
+              run: |
+                  git fetch --tags --no-recurse-submodules -f
+                  (cd ./submodules/duckdb && git fetch --all --tags)
+
+            - name: Prepare environment
+              uses: duckdb/duckdb-wasm-ci-env@ae43fa250a6b6ba92fe3d825c6c34b6d68a258a0
+              with:
+                  script: |-
+                      git config --global --add safe.directory '*'
+                      mkdir -p ./lib/build/wasm/release ./reports
+                      yarn install --frozen-lockfile
+
+            - name: Build @duckdb/duckdb-wasm
+              shell: bash
+              run: |
+                      rm -rf ./packages/duckdb-wasm/dist/
+                      yarn workspace @duckdb/duckdb-wasm build:release
+                      yarn workspace @duckdb/duckdb-wasm docs
+
+            - name: Build @duckdb/duckdb-wasm-shell
+              shell: bash
+              run: |
+                      rm -rf ./packages/duckdb-wasm-shell/dist/
+                      yarn workspace @duckdb/duckdb-wasm-shell install:wasmpack
+                      yarn workspace @duckdb/duckdb-wasm-shell build:release
+
+            - name: Build @duckdb/duckdb-wasm-app
+              shell: bash
+              run: |
+                      rm -rf ./packages/duckdb-wasm-app/build/
+                      yarn workspace @duckdb/duckdb-wasm-app build:release
+
+            - name: Package
+              shell: bash
+              run: zip -r duckdb-wasm-packages.zip ./packages
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: duckdb-wasm-packages-loadable
+                  path: duckdb-wasm-packages.zip
+
+            - name: Deploy GitHub Page
+              if: github.ref == 'refs/heads/main'
+              run: |
+                  git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+                  git fetch origin gh-pages
+                  ./scripts/deploy_pages.sh
+
