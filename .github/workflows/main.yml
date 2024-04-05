@@ -8,8 +8,8 @@ on:
     workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref || '' }}-${{ github.base_ref || '' }}-${{ github.ref != 'refs/heads/main' || github.sha }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.ref }}-${{ github.head_ref || '' }}-${{ github.base_ref || '' }}-${{ github.ref != 'refs/heads/main' || github.sha }}
+    cancel-in-progress: true
 
 jobs:
     wasm_mvp:
@@ -258,8 +258,6 @@ jobs:
             - wasm_mvp_loadable
             - wasm_eh_loadable
             - wasm_coi_loadable
-            - clang_format
-            - eslint
         steps:
             - uses: actions/checkout@v4
               with:
@@ -331,22 +329,22 @@ jobs:
             - name: Build @duckdb/duckdb-wasm
               shell: bash
               run: |
-                      rm -rf ./packages/duckdb-wasm/dist/
-                      yarn workspace @duckdb/duckdb-wasm build:release
-                      yarn workspace @duckdb/duckdb-wasm docs
+                  rm -rf ./packages/duckdb-wasm/dist/
+                  yarn workspace @duckdb/duckdb-wasm build:release
+                  yarn workspace @duckdb/duckdb-wasm docs
 
             - name: Build @duckdb/duckdb-wasm-shell
               shell: bash
               run: |
-                      rm -rf ./packages/duckdb-wasm-shell/dist/
-                      yarn workspace @duckdb/duckdb-wasm-shell install:wasmpack
-                      yarn workspace @duckdb/duckdb-wasm-shell build:release
+                  rm -rf ./packages/duckdb-wasm-shell/dist/
+                  yarn workspace @duckdb/duckdb-wasm-shell install:wasmpack
+                  yarn workspace @duckdb/duckdb-wasm-shell build:release
 
             - name: Build @duckdb/duckdb-wasm-app
               shell: bash
               run: |
-                      rm -rf ./packages/duckdb-wasm-app/build/
-                      yarn workspace @duckdb/duckdb-wasm-app build:release
+                  rm -rf ./packages/duckdb-wasm-app/build/
+                  yarn workspace @duckdb/duckdb-wasm-app build:release
 
             - name: Package
               shell: bash
@@ -363,4 +361,3 @@ jobs:
                   git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
                   git fetch origin gh-pages
                   ./scripts/deploy_pages.sh
-
