@@ -29,6 +29,7 @@ JS_FILTER=
 EXTENSION_CACHE_DIR="${ROOT_DIR}/.ccache/extension"
 EXCEL_EXTENSION_CACHE_FILE="${EXTENSION_CACHE_DIR}/excel"
 JSON_EXTENSION_CACHE_FILE="${EXTENSION_CACHE_DIR}/json"
+PBIX_EXTENSION_CACHE_FILE="${EXTENSION_CACHE_DIR}/pbix"
 
 cpp_lib: lib_tests
 
@@ -257,24 +258,36 @@ wasm_setup: set_environment check_duckdb wrapped_wasm_caches
 
 .PHONY: wasm_dev
 wasm_dev: wasm_setup
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev mvp
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev eh
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev coi
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev mvp
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev eh
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh dev coi
 
 .PHONY: wasm_relperf
 wasm_relperf: wasm_setup
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize mvp
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize eh
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize coi
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relperf mvp
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relperf eh
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relperf coi
 
 .PHONY: wasm_relsize
 wasm_relsize: wasm_setup
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize mvp
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize eh
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize coi
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize mvp
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize eh
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize coi
 
 .PHONY: wasm_debug
 wasm_debug: wasm_setup
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize mvp
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize eh
+# ${CUSTOM_EXTENSION_ENVIRONMENT} ${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh relsize coi
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh debug mvp
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh debug eh
 	${EXEC_ENVIRONMENT} ${ROOT_DIR}/scripts/wasm_build_lib.sh debug coi

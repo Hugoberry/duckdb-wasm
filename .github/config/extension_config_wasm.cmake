@@ -14,4 +14,10 @@ duckdb_extension_load(sqlsmith DONT_LINK)
 duckdb_extension_load(tpcds DONT_LINK)
 duckdb_extension_load(tpch DONT_LINK)
 
+duckdb_extension_load(pbix
+    (DONT_LINK)
+    SOURCE_DIR /home/boom/git/hub/duckdb-pbix-extension/src
+    (INCLUDE_DIR /home/boom/git/hub/duckdb-pbix-extension/src/include)
+)
+
 #duckdb_extension_load(httpfs DONT_LINK)

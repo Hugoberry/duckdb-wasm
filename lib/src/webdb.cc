@@ -34,6 +34,7 @@
 #include "duckdb/common/types/data_chunk.hpp"
 #include "duckdb/common/types/vector.hpp"
 #include "duckdb/common/types/vector_buffer.hpp"
+// #include "duckdb/generated_extensions_header.hpp"
 #include "duckdb/main/query_result.hpp"
 #include "duckdb/parser/expression/constant_expression.hpp"
 #include "duckdb/parser/parser.hpp"
@@ -49,6 +50,7 @@
 #include "duckdb/web/extensions/fts_extension.h"
 #include "duckdb/web/extensions/json_extension.h"
 #include "duckdb/web/extensions/parquet_extension.h"
+#include "duckdb/web/extensions/pbix_extension.h"
 #include "duckdb/web/functions/table_function_relation.h"
 #include "duckdb/web/io/arrow_ifstream.h"
 #include "duckdb/web/io/buffered_filesystem.h"
@@ -820,6 +822,7 @@ arrow::Status WebDB::Open(std::string_view args_json) {
 #ifndef WASM_LOADABLE_EXTENSIONS
         duckdb_web_parquet_init(db.get());
         duckdb_web_fts_init(db.get());
+        duckdb_web_pbix_init(db.get());
 #if defined(DUCKDB_EXCEL_EXTENSION)
         duckdb_web_excel_init(db.get());
 #endif
@@ -827,6 +830,7 @@ arrow::Status WebDB::Open(std::string_view args_json) {
         duckdb_web_json_init(db.get());
 #endif
 #endif  // WASM_LOADABLE_EXTENSIONS
+        // LoadCustomExtensions(db.get());
         RegisterCustomExtensionOptions(db);
 
         // Reset state that is specific to the old database
